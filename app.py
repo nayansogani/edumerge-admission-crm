@@ -10,7 +10,7 @@ import csv
 from flask import Response
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///admissions.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/admissions.db'
 app.config['SECRET_KEY'] = 'supersecretkey'
 db = SQLAlchemy(app)
 
@@ -244,16 +244,32 @@ def export_csv():
         flash("Failed to generate report.", "error")
         return redirect(url_for('dashboard'))
     
+with app.app_context():
+    db.create_all()
+    if not Institution.query.first():
+        db.session.add(Institution(name="Global Tech University", jnk_cap=5))
+    if not User.query.first():
+        db.session.bulk_save_objects([
+            User(username='admin', password_hash=generate_password_hash('admin123'), role='Admin'),
+            User(username='officer', password_hash=generate_password_hash('officer123'), role='Officer'),
+            User(username='mgmt', password_hash=generate_password_hash('mgmt123'), role='Management')
+        ])
+    db.session.commit()
+
+# --- LOCAL RUNNER ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        if not Institution.query.first():
-            db.session.add(Institution(name="Global Tech University", jnk_cap=5))
-        if not User.query.first():
-            db.session.bulk_save_objects([
-                User(username='admin', password_hash=generate_password_hash('admin123'), role='Admin'),
-                User(username='officer', password_hash=generate_password_hash('officer123'), role='Officer'),
-                User(username='mgmt', password_hash=generate_password_hash('mgmt123'), role='Management')
-            ])
-        db.session.commit()
     app.run(debug=True)
+    
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()
+#         if not Institution.query.first():
+#             db.session.add(Institution(name="Global Tech University", jnk_cap=5))
+#         if not User.query.first():
+#             db.session.bulk_save_objects([
+#                 User(username='admin', password_hash=generate_password_hash('admin123'), role='Admin'),
+#                 User(username='officer', password_hash=generate_password_hash('officer123'), role='Officer'),
+#                 User(username='mgmt', password_hash=generate_password_hash('mgmt123'), role='Management')
+#             ])
+#         db.session.commit()
+#     app.run(debug=True)
