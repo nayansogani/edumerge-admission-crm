@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import csv
 from flask import Response
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/admissions.db'
@@ -15,14 +16,12 @@ app.config['SECRET_KEY'] = 'supersecretkey'
 db = SQLAlchemy(app)
 
 # --- LOGGER CONFIGURATION ---
-if not os.path.exists('logs'):
-    os.mkdir('logs')
-file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
-file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-file_handler.setLevel(logging.INFO)
-app.logger.addHandler(file_handler)
-app.logger.setLevel(logging.INFO)
 
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+stream_handler.setLevel(logging.INFO)
+app.logger.addHandler(stream_handler)
+app.logger.setLevel(logging.INFO)
 # --- MODELS ---
 class Institution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
