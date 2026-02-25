@@ -1,0 +1,31 @@
+<form action="/apply" method="POST" class="bg-white p-4 border shadow-sm">
+    <h5>Add New Applicant</h5>
+    <div class="row">
+        <div class="col-md-4 mb-2"><input type="text" name="name" placeholder="Full Name" class="form-control" required></div>
+        <div class="col-md-4 mb-2"><input type="email" name="email" placeholder="Email" class="form-control" required></div>
+        <div class="col-md-4 mb-2"><input type="text" name="phone" placeholder="Phone" class="form-control" required></div>
+        
+        <div class="col-md-4 mb-2">
+            <select name="gender" class="form-control"><option>Male</option><option>Female</option></select>
+        </div>
+        <div class="col-md-4 mb-2">
+            <select name="category" class="form-control"><option>GM</option><option>SC</option><option>ST</option></select>
+        </div>
+        <div class="col-md-4 mb-2">
+            <select name="quota" class="form-control">
+                <option value="KCET">KCET (Govt)</option>
+                <option value="MGMT">Management</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-2">
+            <select name="program_id" class="form-control">
+                {% for p in programs %}<option value="{{p.id}}">{{p.name}} ({{p.department}})</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6 mb-2">
+            <input type="text" name="allotment_no" placeholder="Govt Allotment No (Optional)" class="form-control">
+        </div>
+    </div>
+    <button class="btn btn-primary w-100 mt-2">Register Student</button>
+</form>

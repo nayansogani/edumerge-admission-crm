@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-8 flex justify-between items-end">
+    <div>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Applicant Hub</h2>
+        <p class="text-slate-500 mt-2 text-sm font-medium">Register candidates and manage the admission verification pipeline.</p>
+    </div>
+</div>
+
+<div class="bg-white p-8 rounded-3xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 mb-10 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-50 to-white rounded-bl-full -z-10"></div>
+    <div class="mb-6 pb-4 border-b border-slate-100">
+        <h3 class="text-xl font-extrabold text-slate-900">New Registration Form</h3>
+    </div>
+    <form method="POST" action="/applicants" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Candidate Full Name</label><input type="text" name="name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"></div>
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Mobile Number</label><input type="text" name="name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"></div>
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Social Category</label>
+            <select name="category" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-slate-700"><option>GM</option><option>SC</option><option>ST</option><option>OBC</option></select>
+        </div>
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Entry Type</label>
+            <select name="entry_type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-slate-700"><option>Regular</option><option>Lateral</option></select>
+        </div>
+        
+        <div><label class="block text-sm font-extrabold text-indigo-700 mb-1.5">Admission Quota Type</label>
+            <select name="quota_type" class="w-full bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none font-bold shadow-sm">
+                <option>KCET</option><option>COMEDK</option><option>Management</option>
+                <option value="SNQ">SNQ (Supernumerary)</option>
+                <option value="J&K">J&K (Global Cap)</option>
+            </select>
+        </div>
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Allotment No <span class="text-slate-400 font-normal">(Govt)</span></label><input type="text" name="allotment_number" placeholder="Optional" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+        <div><label class="block text-sm font-bold text-slate-700 mb-1.5">Qualifying Score (%)</label><input type="number" step="0.1" name="marks" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></div>
+        <div><label class="block text-sm font-extrabold text-indigo-700 mb-1.5">Target Academic Program</label>
+            <select name="program_id" class="w-full bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none font-bold shadow-sm">
+                {% for p in programs %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="md:col-span-4 mt-2 border-t border-slate-100 pt-6 flex justify-end">
+            <button type="submit" class="bg-indigo-600 text-white font-extrabold py-3 px-8 rounded-xl shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:bg-indigo-700 hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] transition-all flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Register Candidate
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="bg-white rounded-3xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 overflow-hidden">
+    <div class="px-8 py-6 border-b border-slate-100 bg-white">
+        <h3 class="text-xl font-bold text-slate-900">Active Processing Queue</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-slate-50/50 text-slate-500 text-xs uppercase tracking-wider">
+                    <th class="px-8 py-4 font-bold border-b border-slate-100">Applicant Details</th>
+                    <th class="px-6 py-4 font-bold border-b border-slate-100">Program & Quota</th>
+                    <th class="px-6 py-4 font-bold border-b border-slate-100 text-center">Verification Track</th>
+                    <th class="px-6 py-4 font-bold border-b border-slate-100 text-right">Final Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for a in applicants %}
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-8 py-5">
+                        <div class="font-extrabold text-slate-900 text-base">{{ a.name }}</div>
+                        <div class="text-xs font-semibold text-slate-500 mt-1.5 flex items-center space-x-2">
+                            <span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">{{ a.category }}</span>
+                            <span>Score: <span class="text-slate-700 font-bold">{{ a.marks }}%</span></span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="font-bold text-slate-800">{{ a.program.name }}</div>
+                        <div class="mt-1.5">
+                            <span class="text-[11px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-lg border
+                                {% if a.quota_type == 'J&K' or a.quota_type == 'SNQ' %}bg-purple-50 text-purple-700 border-purple-200{% else %}bg-blue-50 text-blue-700 border-blue-200{% endif %}">
+                                {{ a.quota_type }} Seat
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        {% if a.status != 'Admitted' %}
+                        <form method="POST" action="/update_status/{{ a.id }}" class="flex justify-center items-center space-x-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200/60 inline-flex mx-auto w-max">
+                            <select name="doc_status" class="border-none shadow-sm text-xs font-bold rounded-lg py-2 focus:ring-0 cursor-pointer transition-colors {% if a.doc_status == 'Verified' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100/60 text-amber-800{% endif %}">
+                                <option {% if a.doc_status == 'Pending' %}selected{% endif %}>Doc: Pending</option>
+                                <option {% if a.doc_status == 'Verified' %}selected{% endif %}>Doc: Verified</option>
+                            </select>
+                            <select name="fee_status" class="border-none shadow-sm text-xs font-bold rounded-lg py-2 focus:ring-0 cursor-pointer transition-colors {% if a.fee_status == 'Paid' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100/60 text-amber-800{% endif %}">
+                                <option {% if a.fee_status == 'Pending' %}selected{% endif %}>Fee: Pending</option>
+                                <option {% if a.fee_status == 'Paid' %}selected{% endif %}>Fee: Paid</option>
+                            </select>
+                            <button type="submit" class="bg-slate-900 text-white px-3 py-2 text-xs font-bold rounded-lg hover:bg-slate-700 transition">Update</button>
+                        </form>
+                        {% else %}
+                        <div class="flex justify-center space-x-2">
+                            <span class="flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl"><svg class="w-4 h-4 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Verified</span>
+                            <span class="flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl"><svg class="w-4 h-4 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Paid</span>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-5 text-right">
+                        {% if a.status == 'Admitted' %}
+                            <div class="inline-flex items-center bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm mb-1.5">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Admitted
+                            </div>
+                            <div class="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">{{ a.admission_number }}</div>
+                        {% else %}
+                            <form method="POST" action="/admit/{{ a.id }}">
+                                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2.5 text-sm font-bold rounded-xl shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition transform hover:-translate-y-0.5">Allocate Seat</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
